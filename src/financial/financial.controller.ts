@@ -3,6 +3,7 @@ import { AgentService } from '../agent/agent.service';
 import { SectorsService } from '../sectors/sectors.service';
 import { StockComparisonDto } from './dto/stock-comparison.dto';
 import { PortfolioRiskDto } from './dto/portfolio-risk.dto';
+import { GenerateReportDto, ReportType } from './dto/generate-report.dto';
 
 @Controller('api/financial')
 export class FinancialController {
@@ -34,7 +35,6 @@ export class FinancialController {
     };
   }
 
-  // Add this endpoint inside FinancialController
   @Post('risk-score')
   @HttpCode(HttpStatus.OK)
   async evaluateRisk(@Body() dto: PortfolioRiskDto) {
@@ -55,6 +55,33 @@ export class FinancialController {
       totalHoldings: dto.items.length,
       timestamp: new Date().toISOString(),
       riskAnalysis,
+    };
+  }
+
+  @Post('report')
+  @HttpCode(HttpStatus.OK)
+  async generateReport(@Body() dto: GenerateReportDto) {
+    let rawMarketData: any;
+
+    // 1. Fetch appropriate market data payload from Sectors API
+    if (dto.reportType === ReportType.SECTOR_OVERVIEW) {
+      rawMarketData = await this.sectorsService.getSectorOverview(dto.target);
+    } else {
+      rawMarketData = await this.sectorsService.getCompanyReport(dto.target);
+    }
+
+    // 2. Synthesize institutional report using Gemini Agent
+    const reportMarkdown = await this.agentService.generateFinancialReport(
+      dto,
+      rawMarketData,
+    );
+
+    return {
+      success: true,
+      target: dto.target.toUpperCase(),
+      reportType: dto.reportType,
+      generatedAt: new Date().toISOString(),
+      report: reportMarkdown,
     };
   }
 }

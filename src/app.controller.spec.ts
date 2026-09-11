@@ -15,8 +15,13 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should serve dashboard html', () => {
+      const res = {
+        send: vi.fn(),
+      } as any;
+      appController.getDashboard(res);
+      expect(res.send).toHaveBeenCalled();
+      expect(res.send.mock.calls[0][0]).toContain('Sectors AI Financial Agent');
     });
   });
 });

@@ -6,6 +6,10 @@ import axios from 'axios';
 export class SectorsService {
   constructor(private readonly configService: ConfigService) {}
 
+  private get baseUrl() {
+    return this.configService.get<string>('SECTORS_BASE_URL');
+  }
+
   private get headers() {
     return {
       Authorization: this.configService.get<string>('SECTORS_API_KEY'),
@@ -16,7 +20,7 @@ export class SectorsService {
     try {
       const requests = tickers.map((ticker) =>
         axios.get(
-          `${this.configService.get<string>('SECTORS_BASE_URL')}/company/report/${ticker.toUpperCase()}/`,
+          `${this.baseUrl}/company/report/${ticker.toUpperCase()}/`,
           { headers: this.headers },
         ),
       );
@@ -32,12 +36,11 @@ export class SectorsService {
     }
   }
 
-  // Add this method inside SectorsService
   async getPortfolioMarketData(tickers: string[]) {
     try {
       const requests = tickers.map((ticker) =>
         axios.get(
-          `${this.configService.get<string>('SECTORS_BASE_URL')}/company/report/${ticker.toUpperCase()}/`,
+          `${this.baseUrl}/company/report/${ticker.toUpperCase()}/`,
           { headers: this.headers },
         ),
       );
@@ -49,6 +52,21 @@ export class SectorsService {
     } catch (error: any) {
       throw new HttpException(
         `Failed to fetch portfolio market data: ${error.response?.data?.detail || error.message}`,
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
+  }
+
+  async getCompanyReport(ticker: string) {
+    try {
+      const response = await axios.get(
+        `${this.baseUrl}/company/report/${ticker.toUpperCase()}/`,
+        { headers: this.headers },
+      );
+      return response.data;
+    } catch (error: any) {
+      throw new HttpException(
+        `Failed to fetch company report for ${ticker}: ${error.response?.data?.detail || error.message}`,
         HttpStatus.BAD_GATEWAY,
       );
     }
