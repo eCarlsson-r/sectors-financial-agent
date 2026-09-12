@@ -61,14 +61,7 @@ export class FinancialController {
   @Post('report')
   @HttpCode(HttpStatus.OK)
   async generateReport(@Body() dto: GenerateReportDto) {
-    let rawMarketData: any;
-
-    // 1. Fetch appropriate market data payload from Sectors API
-    if (dto.reportType === ReportType.SECTOR_OVERVIEW) {
-      rawMarketData = await this.sectorsService.getSectorOverview(dto.target);
-    } else {
-      rawMarketData = await this.sectorsService.getCompanyReport(dto.target);
-    }
+    const rawMarketData = await this.sectorsService.getCompanyReport(dto.target);
 
     // 2. Synthesize institutional report using Gemini Agent
     const reportMarkdown = await this.agentService.generateFinancialReport(

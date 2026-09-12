@@ -16,7 +16,6 @@ describe('FinancialController', () => {
             getMultipleCompanyReports: vi.fn(),
             getPortfolioMarketData: vi.fn(),
             getCompanyReport: vi.fn(),
-            getSectorOverview: vi.fn(),
           },
         },
         {

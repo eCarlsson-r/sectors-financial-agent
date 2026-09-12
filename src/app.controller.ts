@@ -780,7 +780,6 @@ export class AppController {
                 </div>
                 <span class="text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Single Stock</span>
               </div>
-            }
           </div>
 
           <!-- Custom Research Instructions -->
